@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Video Generator</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+ font-family:Arial,sans-serif;
+ background:#080B16;
+ color:white;
+ min-height:100vh;
+}
+
+header{
+ height:75px;
+ padding:0 7%;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ border-bottom:1px solid #202840;
+ background:#0c1020;
+}
+
+.logo{
+ font-size:23px;
+ font-weight:bold;
+ color:#a78bfa;
+}
+
+.logo span{color:white}
+
+button{
+ border:0;
+ cursor:pointer;
+ border-radius:10px;
+ font-weight:bold;
+}
+
+.login{
+ background:#fff;
+ color:#222;
+ padding:12px 20px;
+}
+
+main{
+ max-width:1000px;
+ margin:60px auto;
+ padding:20px;
+}
+
+.hero{text-align:center;margin-bottom:40px}
+
+.hero h1{
+ font-size:clamp(32px,6vw,55px);
+ margin-bottom:15px;
+ background:linear-gradient(90deg,#8b5cf6,#22d3ee);
+ -webkit-background-clip:text;
+ color:transparent;
+}
+
+.hero p{color:#9ca3af;line-height:1.7}
+
+.generator{
+ background:#11182b;
+ border:1px solid #283450;
+ border-radius:20px;
+ padding:28px;
+ box-shadow:0 15px 60px #0008;
+}
+
+h2{margin-bottom:20px}
+
+label{
+ display:block;
+ margin:18px 0 9px;
+ color:#cbd5e1;
+ font-size:14px;
+}
+
+textarea,select{
+ width:100%;
+ padding:15px;
+ background:#080e1d;
+ border:1px solid #34415e;
+ border-radius:10px;
+ color:white;
+ outline:none;
+ font-size:15px;
+}
+
+textarea{
+ min-height:130px;
+ resize:vertical;
+}
+
+textarea:focus,select:focus{
+ border-color:#8b5cf6;
+}
+
+.options{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:18px;
+}
+
+.generate{
+ width:100%;
+ margin-top:25px;
+ padding:17px;
+ background:linear-gradient(90deg,#7c3aed,#2563eb);
+ color:white;
+ font-size:16px;
+ transition:.3s;
+}
+
+.generate:hover{opacity:.85;transform:translateY(-2px)}
+.generate:disabled{opacity:.5;cursor:wait}
+
+.status{
+ margin-top:20px;
+ color:#a5b4fc;
+ text-align:center;
+}
+
+.result{
+ margin-top:25px;
+ display:none;
+}
+
+video{
+ width:100%;
+ border-radius:12px;
+ background:black;
+}
+
+.download{
+ display:inline-block;
+ margin-top:15px;
+ padding:12px 20px;
+ background:#059669;
+ color:white;
+ text-decoration:none;
+ border-radius:9px;
+}
+
+.features{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:15px;
+ margin-top:35px;
+}
+
+.feature{
+ background:#11182b;
+ padding:22px;
+ border-radius:14px;
+ border:1px solid #26324a;
+ text-align:center;
+}
+
+.feature h3{margin:12px 0}
+.feature p{color:#9ca3af;font-size:13px;line-height:1.6}
+
+footer{
+ text-align:center;
+ padding:30px;
+ color:#64748b;
+ margin-top:50px;
+}
+
+#userInfo{font-size:13px;color:#a5b4fc}
+
+@media(max-width:600px){
+ main{margin:30px auto}
+ .generator{padding:18px}
+ .options,.features{grid-template-columns:1fr}
+ header{padding:0 4%}
+ .logo{font-size:19px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">AI <span>VIDEO GENERATOR</span></div>
+ <div>
+  <span id="userInfo"></span>
+  <button class="login" id="loginBtn" onclick="login()">
+   Sign in with Google
+  </button>
+  <button class="login" id="logoutBtn"
+   onclick="logout()" style="display:none">
+   Logout
+  </button>
+ </div>
+</header>
+
+<main>
+
+<section class="hero">
+ <h1>Create Videos With AI</h1>
+ <p>Turn your imagination into stunning AI videos.<br>
+ Describe your idea and let AI create it.</p>
+</section>
+
+<section class="generator">
+
+<h2>🎬 AI Video Studio</h2>
+
+<label>Describe Your Video</label>
+
+<textarea id="prompt"
+placeholder="Example: A beautiful cinematic view of Mount Everest at sunrise, realistic clouds, 4K cinematic style..."></textarea>
+
+<div class="options">
+
+<div>
+<label>Video Aspect Ratio</label>
+<select id="ratio">
+<option value="16:9">Landscape (16:9)</option>
+<option value="9:16">Portrait (9:16)</option>
+<option value="1:1">Square (1:1)</option>
+</select>
+</div>
+
+<div>
+<label>Video Duration</label>
+<select id="duration">
+<option value="5">5 Seconds</option>
+<option value="10">10 Seconds</option>
+<option value="15">15 Seconds</option>
+</select>
+</div>
+
+</div>
+
+<label>Video Style</label>
+<select id="style">
+<option value="cinematic">Cinematic</option>
+<option value="realistic">Realistic</option>
+<option value="anime">Anime</option>
+<option value="3d">3D Animation</option>
+<option value="documentary">Documentary</option>
+</select>
+
+<button class="generate" id="generateBtn"
+onclick="generateVideo()">
+✨ Generate AI Video
+</button>
+
+<div class="status" id="status"></div>
+
+<div class="result" id="result">
+<h3>Your Generated Video</h3>
+<br>
+<video id="videoPlayer" controls playsinline></video>
+<a id="downloadBtn" class="download"
+download="AI-Video.mp4">⬇ Download Video</a>
+</div>
+
+</section>
+
+<section class="features">
+
+<div class="feature">
+<h2>🤖</h2>
+<h3>AI Powered</h3>
+<p>Generate creative videos using an AI video generation service.</p>
+</div>
+
+<div class="feature">
+<h2>⚡</h2>
+<h3>Fast Creation</h3>
+<p>Submit your prompts and track generation progress.</p>
+</div>
+
+<div class="feature">
+<h2>🌍</h2>
+<h3>Easy Access</h3>
+<p>Use your Google account to access your studio.</p>
+</div>
+
+</section>
+</main>
+
+<footer>
+© 2026 AI Video Generator | Powered by AI
+</footer>
+
+<script>
+
+// 1. FIREBASE CONFIGURATION
+// Replace these values with your Firebase project settings.
+
+const firebaseConfig = {
+ apiKey: "YOUR_FIREBASE_API_KEY",
+ authDomain: "YOUR_PROJECT.firebaseapp.com",
+ projectId: "YOUR_PROJECT_ID",
+ appId: "YOUR_FIREBASE_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// 2. GOOGLE LOGIN
+
+function login(){
+ auth.signInWithPopup(provider)
+ .catch(error => {
+  alert("Login failed: " + error.message);
+ });
+}
+
+function logout(){
+ auth.signOut();
+}
+
+auth.onAuthStateChanged(user => {
+ const loginBtn = document.getElementById("loginBtn");
+ const logoutBtn = document.getElementById("logoutBtn");
+ const userInfo = document.getElementById("userInfo");
+
+ if(user){
+  loginBtn.style.display="none";
+  logoutBtn.style.display="inline-block";
+  userInfo.textContent="Hi, "+user.displayName+" ";
+ }else{
+  loginBtn.style.display="inline-block";
+  logoutBtn.style.display="none";
+  userInfo.textContent="";
+ }
+});
+
+// 3. AI VIDEO GENERATION
+
+async function generateVideo(){
+
+ const user = auth.currentUser;
+
+ if(!user){
+  alert("Please login with Google first!");
+  login();
+  return;
+ }
+
+ const prompt = document.getElementById("prompt").value.trim();
+
+ if(!prompt){
+  alert("Please describe your video first!");
+  return;
+ }
+
+ const btn = document.getElementById("generateBtn");
+ const status = document.getElementById("status");
+ const result = document.getElementById("result");
+
+ btn.disabled=true;
+ status.textContent="Preparing your AI video...";
+ result.style.display="none";
+
+ try{
+
+  const token = await user.getIdToken();
+
+  // Secure backend API endpoint
+  const response = await fetch("/api/generate-video",{
+   method:"POST",
+   headers:{
+    "Content-Type":"application/json",
+    "Authorization":"Bearer "+token
+   },
+   body:JSON.stringify({
+    prompt:prompt,
+    aspectRatio:document.getElementById("ratio").value,
+    duration:Number(document.getElementById("duration").value),
+    style:document.getElementById("style").value
+   })
+  });
+
+  if(!response.ok){
+   throw new Error("Video generation failed. Check your backend.");
+  }
+
+  const data = await response.json();
+
+  if(!data.videoUrl){
+   throw new Error("Video URL not received from server.");
+  }
+
+  const video = document.getElementById("videoPlayer");
+  video.src=data.videoUrl;
+
+  document.getElementById("downloadBtn").href=data.videoUrl;
+
+  result.style.display="block";
+  status.textContent="✅ Your video is ready!";
+
+ }catch(error){
+
+  status.textContent="❌ "+error.message;
+
+ }finally{
+  btn.disabled=false;
+ }
+}
+
+</script>
+
+</body>
+</html>
+
