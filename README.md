@@ -1,124 +1,74 @@
-# AI Creator Studio — Node.js Backend
+# AI Creator Studio — Complete Node.js API-connected project
 
-A responsive AI creation dashboard with a Node.js/Express backend. It includes:
-- Text to Video
-- Text to Movie
-- Text to Image
-- Text to Voice
-- Text to Story
-- Text to Song
-- Image to Video
-- Image to Story
-- Image to Song
-- AI Editor
+This project contains the frontend and a Node.js/Express backend for 10 AI tools:
+Text to Video, Text to Movie, Text to Image, Text to Voice, Text to Story,
+Text to Song, Image to Video, Image to Story, Image to Song, and AI Editor.
 
-## Important: provider setup is required
+## Important: API credentials are not included
 
-This project includes working API integration code, but it does **not** include paid AI API keys or model subscriptions. Actual generation only works after you configure your own provider credentials and compatible model IDs. API keys stay on the server in `.env`; do not add them to `public/app.js` or commit `.env` to GitHub.
+A ZIP cannot safely contain someone else's private API keys. This project is wired to call the providers from the backend, but you must add your own provider credentials to `.env`. The `.env.example` contains blank placeholders, not working keys. Never send keys in chat or put them in `public/` files or GitHub.
 
-### Providers used
+Provider coverage:
+- OpenAI: text/story/editor, image generation, text-to-speech.
+- Replicate: video and music generation. Each selected model must be accessible to your account.
 
-- **OpenAI API**: text/story/editor, image generation, text-to-speech.
-- **Replicate API**: video/movie, image-to-video and music generation. Choose a model for each tool and configure its input template to match that model's documented schema.
-
-The Replicate model schemas differ. The `.env.example` templates are starter examples, not a guarantee that every model accepts the same fields. Check the selected model's input schema in Replicate and adjust the matching `REPLICATE_INPUT_*` JSON.
-
-## Requirements
-
-- Node.js 20 or newer
-- OpenAI API key for OpenAI-powered tools
-- Replicate API token and compatible model slugs for video/music tools
-
-## Run locally
+## Setup (Windows / VS Code)
 
 1. Extract the ZIP.
-2. Open a terminal in the `AI_Creator_Studio_Node` folder.
-3. Install dependencies:
+2. Open the `AI_Creator_Studio_Node` folder in VS Code.
+3. Install Node.js 20 or newer.
+4. Open Terminal in that folder and run:
 
-   ```bash
+   ```powershell
    npm install
+   Copy-Item .env.example .env
    ```
 
-4. Copy `.env.example` to `.env`.
-   - Windows PowerShell: `Copy-Item .env.example .env`
-   - macOS/Linux: `cp .env.example .env`
+5. Open `.env` locally. Add your OpenAI key and Replicate token. Add the exact Replicate model slugs you selected.
+6. In the Replicate model page, inspect its **Input** schema and make the matching `REPLICATE_INPUT_*` JSON template match the exact field names and accepted values. The examples are not universal.
+7. Run:
 
-5. Add your provider credentials and model configuration to `.env`. Keep this file private; never paste keys into chat or browser code.
-6. Start the server:
-
-   ```bash
+   ```powershell
    npm start
    ```
 
-7. Open `http://localhost:3000`.
+8. Open **http://localhost:3000**. Do not open `public/index.html` directly as a file.
+9. Visit **http://localhost:3000/api/health** to check whether the server sees the provider credentials. This endpoint never returns the secret values.
 
-For development with auto-restart:
+## Which tools need which provider?
 
-```bash
-npm run dev
-```
+| Tool | Provider |
+|---|---|
+| Text to Image | OpenAI |
+| Text to Voice | OpenAI |
+| Text to Story | OpenAI |
+| Image to Story | OpenAI |
+| AI Editor | OpenAI |
+| Text to Video | Replicate + video model |
+| Text to Movie | Replicate + video model |
+| Image to Video | Replicate + image-to-video model |
+| Text to Song | Replicate + music model |
+| Image to Song | Replicate + image/music model |
 
-## API endpoints
+## Common "Generate request failed" causes
 
-### `GET /api/health`
-Returns backend status, provider-configuration booleans, and the number of generators configured. It never returns secret keys. The dashboard uses this endpoint to hide the setup notice only when all ten generators have their required credentials and model configuration.
+- `OPENAI_API_KEY is not configured`: add the key to `.env`, save, restart `npm start`.
+- `REPLICATE_API_TOKEN is not configured`: add the Replicate token, save, restart.
+- `No Replicate model configured`: set the matching `REPLICATE_MODEL_*` variable.
+- Invalid input / model validation: adapt the JSON template to the model's exact input schema.
+- 401 / 403 from provider: key/token invalid, account lacks access, or model unavailable.
+- 429: provider quota/rate limit or billing limit.
+- Backend offline: run `npm start` and open the localhost URL above.
 
-### `POST /api/generate`
-Multipart form fields:
-- `mode`: one of the generator IDs listed above
-- `prompt`: text prompt
-- `image`: optional PNG/JPG/WEBP image (required for image-to-video, image-to-story and image-to-song)
-- `duration`: optional 5 or 10 seconds for video models
-- `aspectRatio`: `16:9`, `9:16` or `1:1`
+## Security
 
-The server returns text, image/audio data, or a Replicate job ID.
+- Credentials are read only by Node.js from `.env`.
+- `.env` is excluded by `.gitignore`.
+- Do not publish `.env`, API tokens, or screenshots that show tokens.
+- This is a development starter. Before public launch, add authentication, per-user quotas, abuse prevention, durable job storage, HTTPS, and production deployment hardening.
 
-### `GET /api/jobs/:id`
-Checks the status of a Replicate generation job.
+## Notes
 
-## Configure the providers
-
-### OpenAI
-Set:
-- `OPENAI_API_KEY`
-- optionally `OPENAI_TEXT_MODEL`, `OPENAI_IMAGE_MODEL`, `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`
-
-OpenAI-powered tools:
-- Text to Image
-- Text to Voice
-- Text to Story
-- Image to Story
-- AI Editor
-
-### Replicate
-Set:
-- `REPLICATE_API_TOKEN`
-- `REPLICATE_MODEL_VIDEO`
-- `REPLICATE_MODEL_MOVIE`
-- `REPLICATE_MODEL_IMAGE_VIDEO`
-- `REPLICATE_MODEL_SONG`
-- `REPLICATE_MODEL_IMAGE_SONG`
-
-Each model value should be a Replicate model slug in `owner/name` form. Adjust the `REPLICATE_INPUT_*` JSON templates so their keys match the model's input schema. Supported placeholders: `{{prompt}}`, `{{image}}`, `{{duration}}`, `{{aspectRatio}}`.
-
-## Security notes
-
-- Never expose provider API keys to browser code.
-- `.env` is ignored by Git.
-- Uploads are limited to 10 MB and PNG/JPG/WEBP.
-- API requests are rate-limited.
-- Use HTTPS in production.
-- Add user authentication, per-user quotas and persistent storage before offering this publicly.
-- Do not expose this development server directly to the public internet without production hardening.
-
-## Known limitations
-
-- “Text to Movie” generates a short clip according to the selected model's maximum duration; it is not a full-length feature-film editor.
-- Video and music generation are asynchronous and depend on the selected Replicate model.
-- This starter project does not include user accounts, payment handling, or permanent cloud storage.
-- Generated media links may expire depending on the provider. Download important results promptly.
-
-
-## Dashboard connection status
-
-The dashboard checks `/api/health` automatically. It shows **All AI services ready** and hides the setup notice only when OpenAI and Replicate credentials are present and all five Replicate model slugs are configured. If any setting is missing, it shows which type of configuration is still needed. This status check does not test billing, model permissions, or whether a provider will accept a particular prompt; the first generation request is the final provider-side test.
+- Video and music jobs are asynchronous.
+- Text-to-Movie creates short generated clips according to the selected model's limits; it is not a full-length film editor.
+- API usage may cost money. Ask a parent/guardian to help review provider accounts and billing.

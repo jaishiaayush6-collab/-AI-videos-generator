@@ -63,29 +63,18 @@ const upload = multer({
 });
 
 app.get("/api/health", (_req, res) => {
-  const openAiReady = Boolean(config.openAiKey);
-  const replicateReady = Boolean(config.replicateToken);
-  const generators = {
-    "text-to-image": openAiReady,
-    "text-to-voice": openAiReady,
-    "text-to-story": openAiReady,
-    "image-to-story": openAiReady,
-    "ai-editor": openAiReady,
-    "text-to-video": replicateReady && Boolean(replicateModels["text-to-video"]),
-    "text-to-movie": replicateReady && Boolean(replicateModels["text-to-movie"]),
-    "image-to-video": replicateReady && Boolean(replicateModels["image-to-video"]),
-    "text-to-song": replicateReady && Boolean(replicateModels["text-to-song"]),
-    "image-to-song": replicateReady && Boolean(replicateModels["image-to-song"])
-  };
-  const readyCount = Object.values(generators).filter(Boolean).length;
+  const openai = Boolean(config.openAiKey);
+  const replicate = Boolean(config.replicateToken);
+  const models = Object.fromEntries(Object.entries(replicateModels).map(([mode, model]) => [mode, Boolean(model)]));
+  const replicateReady = replicate && Object.values(models).every(Boolean);
   res.json({
     ok: true,
     service: "AI Creator Studio API",
-    providers: { openai: openAiReady, replicate: replicateReady },
-    generators,
-    readyCount,
-    totalGenerators: Object.keys(generators).length,
-    allReady: readyCount === Object.keys(generators).length
+    providers: {
+      openai: { configured: openai },
+      replicate: { configured: replicate, models }
+    },
+    ready: { openai, replicate: replicate && Object.values(models).some(Boolean) }
   });
 });
 
