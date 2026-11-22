@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d1b">
+  <title>Image to Story | AI Creator Studio</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span class="brand-mark">✦</span><span>AI Creator<small>STUDIO</small></span></a>
+      <div class="nav-label">WORKSPACE</div>
+      <a class="nav-item " href="index.html"><span>⌂</span> Dashboard</a>
+      <div class="nav-label">AI TOOLS</div>
+      <a class="nav-item " href="video-movie.html"><span>🎬</span>Video & Movie</a><a class="nav-item " href="text-to-image.html"><span>🖼️</span>Text to Image</a><a class="nav-item " href="text-to-voice.html"><span>🎙️</span>Text to Voice</a><a class="nav-item " href="text-to-story.html"><span>📖</span>Text to Story</a><a class="nav-item " href="text-to-song.html"><span>🎵</span>Text to Song</a><a class="nav-item " href="image-to-video.html"><span>✨</span>Image to Video</a><a class="nav-item active" href="image-to-story.html"><span>📚</span>Image to Story</a><a class="nav-item " href="image-to-song.html"><span>🎼</span>Image to Song</a><a class="nav-item " href="ai-editor.html"><span>✂️</span>AI Editor</a>
+      <div class="sidebar-foot">Creative ideas, made simple.</div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar"><span>AI Creator Studio</span><span class="profile-dot">AJ</span></header>
+      
+        <section class="page-heading"><a class="back-link" href="index.html">← All tools</a><span class="eyebrow">AI CREATOR TOOL</span><h1>Image to Story</h1><p>Write a story inspired by an image.</p></section>
+        <section class="workspace">
+          <form id="creatorForm" data-mode="image-story">
+            <label class="upload-box"><input id="imageFile" type="file" accept="image/*"><span class="upload-symbol">＋</span><b>Choose an image</b><small>PNG, JPG or WEBP</small><img id="preview" alt="Selected image preview" hidden></label>
+            <label class="field-label" for="prompt">What kind of story should this image inspire?</label>
+            <textarea id="prompt" rows="7" placeholder="Write a warm, imaginative story based on this scene..." required></textarea>
+            
+            <button class="primary-btn" type="submit"><span>✦</span> Generate</button>
+          </form>
+          <aside class="result-panel"><div class="result-top"><b>Preview / Result</b><span class="status">DEMO</span></div><div id="result" class="empty-result"><span class="result-icon">✧</span><b>Your result will appear here</b><p>Enter your prompt and select Generate to see a demo response.</p></div></aside>
+        </section>
+        <p class="notice"><b>Important:</b> This is a front-end starter template. Real AI video, image, voice, story, and music generation needs a secure backend connected to suitable AI APIs. Never put private API keys in HTML or JavaScript.</p>
+        
+      <footer>© 2026 AI Creator Studio · Starter UI</footer>
+    </main>
+  </div>
+</body>
+</html>
