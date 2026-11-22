@@ -1,42 +1,119 @@
-# AI Video Generator Studio
+# AI Creator Studio — Node.js Backend
 
-A starter full-stack project with a responsive creative studio UI, Firebase Google sign-in, an Express backend, protected generation endpoints, upload validation, rate limiting, and asynchronous job polling.
+A responsive AI creation dashboard with a Node.js/Express backend. It includes:
+- Text to Video
+- Text to Movie
+- Text to Image
+- Text to Voice
+- Text to Story
+- Text to Song
+- Image to Video
+- Image to Story
+- Image to Song
+- AI Editor
 
-## Features in the UI
-- Google sign-in/sign-out (Firebase Authentication)
-- Short video (90–300 seconds), long video (300–1,800 seconds), movie (1,800–7,200 seconds)
-- Realistic, anime, cartoon, cinematic, 3D and documentary style options
-- Character presets and custom character description
-- Text-to-video, text-to-image, text-to-voice, text-to-story, text-to-song
-- Image-to-video, image-to-story, image-to-song and AI editing interface
-- Resolution, aspect ratio, language, narration and music options
-- Generation progress, result preview and download link
+## Important: provider setup is required
 
-## Important: connect an actual AI provider
-This repository does not include a proprietary video/image/music model and does not promise unlimited free generation. The backend uses a generic provider adapter. Configure a provider endpoint that implements the contract below. Provider pricing, supported durations, formats and quotas apply.
+This project includes working API integration code, but it does **not** include paid AI API keys or model subscriptions. Actual generation only works after you configure your own provider credentials and compatible model IDs. API keys stay on the server in `.env`; do not add them to `public/app.js` or commit `.env` to GitHub.
 
-### Provider contract
-`POST AI_PROVIDER_URL` with `Authorization: Bearer AI_PROVIDER_API_KEY` and JSON body containing `type`, prompt, settings and optional `sourceFile` (`name`, `mimeType`, `base64`). Return either:
-- `{ "jobId": "provider-job-id" }` for an asynchronous task, or
-- `{ "url": "https://..." }` / `{ "videoUrl": "..." }` / `{ "imageUrl": "..." }` / `{ "audioUrl": "..." }` / `{ "text": "..." }` for a completed result.
+### Providers used
 
-For asynchronous jobs, implement `GET AI_PROVIDER_URL/jobs/:jobId` and return `{ "status": "queued|processing|completed|failed", "progress": 0-100, ...resultFields }`.
+- **OpenAI API**: text/story/editor, image generation, text-to-speech.
+- **Replicate API**: video/movie, image-to-video and music generation. Choose a model for each tool and configure its input template to match that model's documented schema.
 
-Different AI vendors use different APIs. Adapt `backend/server.js` to the provider's documented request and response schema before production use.
+The Replicate model schemas differ. The `.env.example` templates are starter examples, not a guarantee that every model accepts the same fields. Check the selected model's input schema in Replicate and adjust the matching `REPLICATE_INPUT_*` JSON.
 
-## Setup
-1. Install Node.js 20 or newer.
-2. Run `npm install`.
-3. Copy `.env.example` to `.env` and configure Firebase Admin credentials and your AI provider endpoint/key.
-4. In Firebase Console, create a Web App and enable Google under Authentication → Sign-in method. Add the web config to `public/index.html`.
-5. Add the same Firebase project service account to the server using `GOOGLE_APPLICATION_CREDENTIALS=/secure/path/service-account.json` or `FIREBASE_SERVICE_ACCOUNT_JSON`.
-6. Set `AI_PROVIDER_URL` and `AI_PROVIDER_API_KEY` in `.env`. Never put the provider key in browser code or commit `.env`.
-7. Run `npm start`, then open `http://localhost:3000`.
+## Requirements
 
-## Deploy
-Deploy the Node server to a host that supports Node.js and persistent/background jobs. For production, use object storage for uploads/results, a durable job queue/database instead of the in-memory job map, HTTPS, strict CORS origins, per-user quotas, provider webhook verification, and appropriate content moderation. Do not use GitHub Pages alone for this backend; it only hosts static files.
+- Node.js 20 or newer
+- OpenAI API key for OpenAI-powered tools
+- Replicate API token and compatible model slugs for video/music tools
 
-## API
-- `GET /api/health` — configuration status.
-- `POST /api/generate` — authenticated multipart generation request.
-- `GET /api/jobs/:id` — authenticated job status (only the owner can read it).
+## Run locally
+
+1. Extract the ZIP.
+2. Open a terminal in the `AI_Creator_Studio_Node` folder.
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Copy `.env.example` to `.env`.
+   - Windows PowerShell: `Copy-Item .env.example .env`
+   - macOS/Linux: `cp .env.example .env`
+
+5. Add your provider credentials and model configuration to `.env`.
+6. Start the server:
+
+   ```bash
+   npm start
+   ```
+
+7. Open `http://localhost:3000`.
+
+For development with auto-restart:
+
+```bash
+npm run dev
+```
+
+## API endpoints
+
+### `GET /api/health`
+Returns backend status.
+
+### `POST /api/generate`
+Multipart form fields:
+- `mode`: one of the generator IDs listed above
+- `prompt`: text prompt
+- `image`: optional PNG/JPG/WEBP image (required for image-to-video, image-to-story and image-to-song)
+- `duration`: optional 5 or 10 seconds for video models
+- `aspectRatio`: `16:9`, `9:16` or `1:1`
+
+The server returns text, image/audio data, or a Replicate job ID.
+
+### `GET /api/jobs/:id`
+Checks the status of a Replicate generation job.
+
+## Configure the providers
+
+### OpenAI
+Set:
+- `OPENAI_API_KEY`
+- optionally `OPENAI_TEXT_MODEL`, `OPENAI_IMAGE_MODEL`, `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`
+
+OpenAI-powered tools:
+- Text to Image
+- Text to Voice
+- Text to Story
+- Image to Story
+- AI Editor
+
+### Replicate
+Set:
+- `REPLICATE_API_TOKEN`
+- `REPLICATE_MODEL_VIDEO`
+- `REPLICATE_MODEL_MOVIE`
+- `REPLICATE_MODEL_IMAGE_VIDEO`
+- `REPLICATE_MODEL_SONG`
+- `REPLICATE_MODEL_IMAGE_SONG`
+
+Each model value should be a Replicate model slug in `owner/name` form. Adjust the `REPLICATE_INPUT_*` JSON templates so their keys match the model's input schema. Supported placeholders: `{{prompt}}`, `{{image}}`, `{{duration}}`, `{{aspectRatio}}`.
+
+## Security notes
+
+- Never expose provider API keys to browser code.
+- `.env` is ignored by Git.
+- Uploads are limited to 10 MB and PNG/JPG/WEBP.
+- API requests are rate-limited.
+- Use HTTPS in production.
+- Add user authentication, per-user quotas and persistent storage before offering this publicly.
+- Do not expose this development server directly to the public internet without production hardening.
+
+## Known limitations
+
+- “Text to Movie” generates a short clip according to the selected model's maximum duration; it is not a full-length feature-film editor.
+- Video and music generation are asynchronous and depend on the selected Replicate model.
+- This starter project does not include user accounts, payment handling, or permanent cloud storage.
+- Generated media links may expire depending on the provider. Download important results promptly.

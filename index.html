@@ -4,25 +4,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#090d1b">
-  <title>AI Creator Studio | AI Creator Studio</title>
+  <title>AI Creator Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <a class="brand" href="index.html"><span class="brand-mark">✦</span><span>AI Creator<small>STUDIO</small></span></a>
-      <div class="nav-label">WORKSPACE</div>
-      <a class="nav-item active" href="index.html"><span>⌂</span> Dashboard</a>
-      <div class="nav-label">AI TOOLS</div>
-      <a class="nav-item " href="video-movie.html"><span>🎬</span>Video & Movie</a><a class="nav-item " href="text-to-image.html"><span>🖼️</span>Text to Image</a><a class="nav-item " href="text-to-voice.html"><span>🎙️</span>Text to Voice</a><a class="nav-item " href="text-to-story.html"><span>📖</span>Text to Story</a><a class="nav-item " href="text-to-song.html"><span>🎵</span>Text to Song</a><a class="nav-item " href="image-to-video.html"><span>✨</span>Image to Video</a><a class="nav-item " href="image-to-story.html"><span>📚</span>Image to Story</a><a class="nav-item " href="image-to-song.html"><span>🎼</span>Image to Song</a><a class="nav-item " href="ai-editor.html"><span>✂️</span>AI Editor</a>
-      <div class="sidebar-foot">Creative ideas, made simple.</div>
-    </aside>
-    <main class="main-content">
-      <header class="topbar"><span>AI Creator Studio</span><span class="profile-dot">AJ</span></header>
-      <section class="hero"><span class="eyebrow">YOUR CREATIVE WORKSPACE</span><h1>Make something <span>amazing.</span></h1><p>Choose a tool below to start creating. This starter website includes responsive pages and demo interactions.</p></section><h2 class="section-title">All AI tools</h2><div class="tool-grid"><a class="tool-card" href="video-movie.html"><span class="tool-icon">🎬</span><span><b>Video & Movie</b><small>Open Video & Movie</small></span><span class="arrow">↗</span></a><a class="tool-card" href="text-to-image.html"><span class="tool-icon">🖼️</span><span><b>Text to Image</b><small>Open Text to Image</small></span><span class="arrow">↗</span></a><a class="tool-card" href="text-to-voice.html"><span class="tool-icon">🎙️</span><span><b>Text to Voice</b><small>Open Text to Voice</small></span><span class="arrow">↗</span></a><a class="tool-card" href="text-to-story.html"><span class="tool-icon">📖</span><span><b>Text to Story</b><small>Open Text to Story</small></span><span class="arrow">↗</span></a><a class="tool-card" href="text-to-song.html"><span class="tool-icon">🎵</span><span><b>Text to Song</b><small>Open Text to Song</small></span><span class="arrow">↗</span></a><a class="tool-card" href="image-to-video.html"><span class="tool-icon">✨</span><span><b>Image to Video</b><small>Open Image to Video</small></span><span class="arrow">↗</span></a><a class="tool-card" href="image-to-story.html"><span class="tool-icon">📚</span><span><b>Image to Story</b><small>Open Image to Story</small></span><span class="arrow">↗</span></a><a class="tool-card" href="image-to-song.html"><span class="tool-icon">🎼</span><span><b>Image to Song</b><small>Open Image to Song</small></span><span class="arrow">↗</span></a><a class="tool-card" href="ai-editor.html"><span class="tool-icon">✂️</span><span><b>AI Editor</b><small>Open AI Editor</small></span><span class="arrow">↗</span></a></div>
-      <footer>© 2026 AI Creator Studio · Starter UI</footer>
-    </main>
-  </div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">✦</span><span>AI Creator<small>STUDIO</small></span></a>
+    <div class="nav-label">WORKSPACE</div>
+    <button class="nav-item active" data-mode="dashboard"><span>⌂</span> Dashboard</button>
+    <div class="nav-label">GENERATORS</div>
+    <button class="nav-item" data-mode="text-to-video"><span>🎬</span> Text to Video</button>
+    <button class="nav-item" data-mode="text-to-movie"><span>🎥</span> Text to Movie</button>
+    <button class="nav-item" data-mode="text-to-image"><span>🖼️</span> Text to Image</button>
+    <button class="nav-item" data-mode="text-to-voice"><span>🎙️</span> Text to Voice</button>
+    <button class="nav-item" data-mode="text-to-story"><span>📖</span> Text to Story</button>
+    <button class="nav-item" data-mode="text-to-song"><span>🎵</span> Text to Song</button>
+    <button class="nav-item" data-mode="image-to-video"><span>✨</span> Image to Video</button>
+    <button class="nav-item" data-mode="image-to-story"><span>📚</span> Image to Story</button>
+    <button class="nav-item" data-mode="image-to-song"><span>🎼</span> Image to Song</button>
+    <button class="nav-item" data-mode="ai-editor"><span>✂️</span> AI Editor</button>
+    <div class="sidebar-foot">Create • Imagine • Publish</div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar"><div><span class="mobile-brand">✦ AI Creator Studio</span><span class="breadcrumb">Workspace / <b id="crumb">Dashboard</b></span></div><div class="top-actions"><span class="api-indicator" id="apiStatus">Checking server…</span><button id="themeToggle" class="icon-btn" aria-label="Toggle theme">☼</button><div class="avatar">AJ</div></div></header>
+
+    <section id="dashboard" class="view">
+      <div class="hero"><span class="eyebrow">YOUR CREATIVE WORKSPACE</span><h1>Make something <span>amazing.</span></h1><p>Bring your ideas to life with AI-powered video, images, voice, stories and music.</p></div>
+      <div class="section-head"><div><h2>All AI generators</h2><p>Choose a tool to start creating</p></div><span class="count-pill">9 TOOLS</span></div>
+      <div class="tool-grid" id="toolGrid"></div>
+      <div class="info-banner"><span>✦</span><div><b>One workspace for every idea</b><p>Text, images, audio and video generation in one place. Configure your API providers on the server to enable generation.</p></div></div>
+      <section class="history-section"><div class="section-head"><div><h2>Recent creations</h2><p>Your recent browser session history</p></div><button class="text-btn" id="clearHistory">Clear history</button></div><div id="historyList" class="history-list"><div class="empty-history">Your recent generations will appear here.</div></div></section>
+    </section>
+
+    <section id="generator" class="view hidden">
+      <div class="page-heading"><button class="back-link" id="backHome">← Dashboard</button><span class="eyebrow">AI CREATOR TOOL</span><h1 id="toolTitle">Text to Video</h1><p id="toolSubtitle">Turn a written prompt into a video.</p></div>
+      <div class="workspace">
+        <form id="generatorForm" class="generator-card">
+          <div id="imageUploadWrap" class="upload-box hidden">
+            <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp">
+            <div id="uploadPlaceholder"><span class="upload-symbol">＋</span><b>Choose an image</b><small>PNG, JPG or WEBP · Max 10 MB</small></div>
+            <img id="imagePreview" alt="Selected image preview" hidden>
+            <button type="button" id="removeImage" class="remove-image hidden">Remove image</button>
+          </div>
+          <label class="field-label" for="prompt" id="promptLabel">Describe your idea</label>
+          <textarea id="prompt" rows="7" maxlength="5000" placeholder="Describe what you want to create…" required></textarea>
+          <div class="field-row" id="videoOptions">
+            <label>Duration<select id="duration"><option value="5">5 seconds</option><option value="10">10 seconds</option></select></label>
+            <label>Aspect ratio<select id="aspectRatio"><option value="16:9">16:9 Landscape</option><option value="9:16">9:16 Portrait</option><option value="1:1">1:1 Square</option></select></label>
+          </div>
+          <div class="field-row hidden" id="voiceOptions">
+            <label>Voice language<select id="voiceLanguage"><option>Auto detect</option><option>Nepali</option><option>Hindi</option><option>English</option></select></label>
+            <label>Voice style<select id="voiceStyle"><option>Natural</option><option>Calm</option><option>Energetic</option></select></label>
+          </div>
+          <p class="form-hint" id="formHint">Be specific about the scene, subject, mood and camera style.</p>
+          <button class="primary-btn" id="generateBtn" type="submit"><span>✦</span> Generate</button>
+          <p class="secure-note"><span>🔒</span> Your API keys stay on the server. Uploaded images are sent to the configured AI provider for processing.</p>
+        </form>
+        <section class="result-panel">
+          <div class="result-top"><div><b>Generation result</b><small id="resultSubtitle">Your output will appear here</small></div><span class="status" id="resultStatus">READY</span></div>
+          <div id="resultBody" class="empty-result"><span class="result-icon">✧</span><b>Your result will appear here</b><p>Enter a prompt and select Generate to get started.</p></div>
+        </section>
+      </div>
+    </section>
+    <footer>© 2026 AI Creator Studio <span>•</span> Built for creative ideas</footer>
+  </main>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
