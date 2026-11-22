@@ -4,7 +4,7 @@ import multer from "multer";
 import rateLimit from "express-rate-limit";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { config } from "./config.js";
+import { config, replicateModels } from "./config.js";
 import { generate, getReplicateJob } from "./ai.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -63,7 +63,30 @@ const upload = multer({
 });
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "AI Creator Studio API" });
+  const openAiReady = Boolean(config.openAiKey);
+  const replicateReady = Boolean(config.replicateToken);
+  const generators = {
+    "text-to-image": openAiReady,
+    "text-to-voice": openAiReady,
+    "text-to-story": openAiReady,
+    "image-to-story": openAiReady,
+    "ai-editor": openAiReady,
+    "text-to-video": replicateReady && Boolean(replicateModels["text-to-video"]),
+    "text-to-movie": replicateReady && Boolean(replicateModels["text-to-movie"]),
+    "image-to-video": replicateReady && Boolean(replicateModels["image-to-video"]),
+    "text-to-song": replicateReady && Boolean(replicateModels["text-to-song"]),
+    "image-to-song": replicateReady && Boolean(replicateModels["image-to-song"])
+  };
+  const readyCount = Object.values(generators).filter(Boolean).length;
+  res.json({
+    ok: true,
+    service: "AI Creator Studio API",
+    providers: { openai: openAiReady, replicate: replicateReady },
+    generators,
+    readyCount,
+    totalGenerators: Object.keys(generators).length,
+    allReady: readyCount === Object.keys(generators).length
+  });
 });
 
 app.post("/api/generate", upload.single("image"), async (req, res, next) => {

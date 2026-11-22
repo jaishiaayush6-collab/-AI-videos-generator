@@ -43,7 +43,7 @@ The Replicate model schemas differ. The `.env.example` templates are starter exa
    - Windows PowerShell: `Copy-Item .env.example .env`
    - macOS/Linux: `cp .env.example .env`
 
-5. Add your provider credentials and model configuration to `.env`.
+5. Add your provider credentials and model configuration to `.env`. Keep this file private; never paste keys into chat or browser code.
 6. Start the server:
 
    ```bash
@@ -61,7 +61,7 @@ npm run dev
 ## API endpoints
 
 ### `GET /api/health`
-Returns backend status.
+Returns backend status, provider-configuration booleans, and the number of generators configured. It never returns secret keys. The dashboard uses this endpoint to hide the setup notice only when all ten generators have their required credentials and model configuration.
 
 ### `POST /api/generate`
 Multipart form fields:
@@ -117,3 +117,8 @@ Each model value should be a Replicate model slug in `owner/name` form. Adjust t
 - Video and music generation are asynchronous and depend on the selected Replicate model.
 - This starter project does not include user accounts, payment handling, or permanent cloud storage.
 - Generated media links may expire depending on the provider. Download important results promptly.
+
+
+## Dashboard connection status
+
+The dashboard checks `/api/health` automatically. It shows **All AI services ready** and hides the setup notice only when OpenAI and Replicate credentials are present and all five Replicate model slugs are configured. If any setting is missing, it shows which type of configuration is still needed. This status check does not test billing, model permissions, or whether a provider will accept a particular prompt; the first generation request is the final provider-side test.

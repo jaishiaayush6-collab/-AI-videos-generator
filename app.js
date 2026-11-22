@@ -270,14 +270,37 @@ if (localStorage.getItem("creatorTheme") === "light") document.body.classList.ad
 
 async function checkServer() {
   const indicator = $("apiStatus");
+  const banner = $("setupBanner");
   try {
-    const response = await fetch("/api/health");
+    const response = await fetch("/api/health", { cache: "no-store" });
     if (!response.ok) throw new Error("offline");
-    indicator.textContent = "Backend connected";
-    indicator.className = "api-indicator online";
+    const status = await response.json();
+    const ready = Number(status.readyCount || 0);
+    const total = Number(status.totalGenerators || 10);
+    if (status.allReady) {
+      indicator.textContent = "All AI services ready";
+      indicator.className = "api-indicator online";
+      banner.classList.add("hidden");
+    } else {
+      indicator.textContent = `AI setup ${ready}/${total}`;
+      indicator.className = "api-indicator setup";
+      banner.classList.remove("hidden");
+      $("setupTitle").textContent = `Backend connected · ${ready} of ${total} generators configured`;
+      const missingOpenAI = !status.providers?.openai;
+      const missingReplicate = !status.providers?.replicate;
+      const missingModels = status.providers?.replicate && Object.entries(status.generators || {}).some(([id, enabled]) => ["text-to-video", "text-to-movie", "image-to-video", "text-to-song", "image-to-song"].includes(id) && !enabled);
+      const needs = [];
+      if (missingOpenAI) needs.push("OPENAI_API_KEY");
+      if (missingReplicate) needs.push("REPLICATE_API_TOKEN");
+      if (missingModels) needs.push("the five compatible Replicate model names and input templates");
+      $("setupMessage").textContent = `Add ${needs.join(" and ")} in your private server .env file, then restart the server. No API keys belong in browser files.`;
+    }
   } catch {
     indicator.textContent = "Backend offline";
     indicator.className = "api-indicator offline";
+    banner.classList.remove("hidden");
+    $("setupTitle").textContent = "Node.js backend is not running";
+    $("setupMessage").textContent = "Open the project folder in a terminal, run npm install and npm start, then refresh this page at http://localhost:3000.";
   }
 }
 renderTools();
